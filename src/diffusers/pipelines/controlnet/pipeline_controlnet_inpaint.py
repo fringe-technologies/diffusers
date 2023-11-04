@@ -1336,6 +1336,8 @@ class StableDiffusionControlNetInpaintPipeline(
                         controlnet_cond_scale = controlnet_cond_scale[0]
                     cond_scale = controlnet_cond_scale * controlnet_keep[i]
 
+                control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
+
                 down_block_res_samples, mid_block_res_sample = self.controlnet(
                     control_model_input,
                     t,
