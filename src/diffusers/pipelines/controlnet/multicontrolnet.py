@@ -50,7 +50,7 @@ class MultiControlNetModel(ModelMixin):
                 input_control=input_control[0]
             else:
                 input_control=torch.cat(input_control, dim=1)
-            logger.info(f"controlnet channels {controlnet.in_channels}")
+                
             down_samples, mid_sample = controlnet(
                 sample=input_control,
                 timestep=timestep,
