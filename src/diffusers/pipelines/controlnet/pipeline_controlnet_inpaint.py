@@ -1451,7 +1451,7 @@ class StableDiffusionControlNetInpaintPipeline(
                     guess_mode=guess_mode,
                     return_dict=False,
                 )
-                print('controlnet did')
+
                 if guess_mode and self.do_classifier_free_guidance:
                     # Infered ControlNet only for the conditional batch.
                     # To apply the output of ControlNet to both the unconditional and conditional batches,
