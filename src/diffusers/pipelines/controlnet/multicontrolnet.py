@@ -49,6 +49,7 @@ class MultiControlNetModel(ModelMixin):
                 sample=sample[0]
             else:
                 sample=torch.cat(sample, dim=1)
+            print('controlnet channels', controlnet.in_channels)
             down_samples, mid_sample = controlnet(
                 sample=sample,
                 timestep=timestep,
