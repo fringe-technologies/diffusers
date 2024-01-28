@@ -1584,6 +1584,12 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 # if control_image.shape[-2:] != control_model_input.shape[-2:]:
                 #     control_image = F.interpolate(control_image, size=control_model_input.shape[-2:], mode="bilinear", align_corners=False)
 
+                if num_channels_unet == 9:
+                    if isinstance(controlnet_keep[i], list):
+                        control_model_input = [latent_model_input, mask, masked_image_latents]
+                    else:
+                        control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
+
                 down_block_res_samples, mid_block_res_sample = self.controlnet(
                     control_model_input,
                     t,
