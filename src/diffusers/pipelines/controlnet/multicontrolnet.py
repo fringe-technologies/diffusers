@@ -52,7 +52,7 @@ class MultiControlNetModel(ModelMixin):
             #input_control=torch.cat(sample, dim=1)
                 
             down_samples, mid_sample = controlnet(
-                sample=input_control,
+                sample=sample,
                 timestep=timestep,
                 encoder_hidden_states=encoder_hidden_states,
                 controlnet_cond=image,
