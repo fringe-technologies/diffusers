@@ -1156,7 +1156,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
         output_type: Optional[str] = "pil",
         return_dict: bool = True,
         cross_attention_kwargs: Optional[Dict[str, Any]] = None,
-        controlnet_conditioning_scale: Union[float, List[float]] = 1.0,
+        controlnet_conditioning_scale: Union[float, List[float]],
         guess_mode: bool = False,
         control_guidance_start: Union[float, List[float]] = 0.0,
         control_guidance_end: Union[float, List[float]] = 1.0,
@@ -1407,7 +1407,11 @@ class StableDiffusionXLControlNetInpaintPipeline(
             batch_size = prompt_embeds.shape[0]
 
         device = self._execution_device
-
+        
+        is_compiled = hasattr(F, "scaled_dot_product_attention") and isinstance(
+                    self.controlnet, torch._dynamo.eval_frame.OptimizedModule
+                )
+        
         if isinstance(controlnet, MultiControlNetModel) and isinstance(controlnet_conditioning_scale, float):
             controlnet_conditioning_scale = [controlnet_conditioning_scale] * len(controlnet.nets)
 
@@ -1691,9 +1695,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     controlnet_prompt_embeds = prompt_embeds
                     controlnet_added_cond_kwargs = added_cond_kwargs
                     
-                is_compiled = hasattr(F, "scaled_dot_product_attention") and isinstance(
-                    self.controlnet, torch._dynamo.eval_frame.OptimizedModule
-                )
                 if isinstance(controlnet_keep[i], list) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
                     cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
                 else:
