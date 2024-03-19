@@ -44,7 +44,8 @@ class MultiControlNetModel(ModelMixin):
         guess_mode: bool = False,
         return_dict: bool = True,
     ) -> Union[ControlNetOutput, Tuple]:
-        for i, (image, scale, controlnet) in enumerate(zip(controlnet_cond, conditioning_scale, self.nets)):
+        i = 0
+        for image, scale, controlnet in zip(controlnet_cond, conditioning_scale, self.nets):
             input_control = sample
             if controlnet.in_channels==4:
                 input_control=input_control[0]
@@ -75,6 +76,7 @@ class MultiControlNetModel(ModelMixin):
                     for samples_prev, samples_curr in zip(down_block_res_samples, down_samples)
                 ]
                 mid_block_res_sample += mid_sample
+            i = i+1
 
         return down_block_res_samples, mid_block_res_sample
 
