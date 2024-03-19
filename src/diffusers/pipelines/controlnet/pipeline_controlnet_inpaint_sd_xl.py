@@ -1421,6 +1421,12 @@ class StableDiffusionXLControlNetInpaintPipeline(
         if isinstance(controlnet, MultiControlNetModel) and isinstance(controlnet_conditioning_scale, float):
             controlnet_conditioning_scale = [controlnet_conditioning_scale] * len(controlnet.nets)
 
+        if isinstance(controlnet_conditioning_scale, float):
+            raise ValueError(
+                f"Crazy1!"
+                f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
+            )
+
         # 3. Encode input prompt
         text_encoder_lora_scale = (
             self.cross_attention_kwargs.get("scale", None) if self.cross_attention_kwargs is not None else None
@@ -1611,7 +1617,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 1.0 - float(i / len(timesteps) < s or (i + 1) / len(timesteps) > e)
                 for s, e in zip(control_guidance_start, control_guidance_end)
             ]
-            if isinstance(self.controlnet, MultiControlNetModel):
+            if isinstance(self.controlnet, MultiControlNetModel) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
                 controlnet_keep.append(keeps)
             else:
                 controlnet_keep.append(keeps[0])
@@ -1700,7 +1706,12 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     control_model_input = latent_model_input
                     controlnet_prompt_embeds = prompt_embeds
                     controlnet_added_cond_kwargs = added_cond_kwargs
-                    
+
+                if isinstance(controlnet_conditioning_scale, float):
+                    raise ValueError(
+                        f"Crazy2!"
+                        f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
+                    )
                 if isinstance(controlnet_keep[i], list) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
                     cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
                 else:
