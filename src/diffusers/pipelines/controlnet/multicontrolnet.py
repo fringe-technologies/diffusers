@@ -44,6 +44,40 @@ class MultiControlNetModel(ModelMixin):
         guess_mode: bool = False,
         return_dict: bool = True,
     ) -> Union[ControlNetOutput, Tuple]:
+        for i, (image, scale, controlnet) in enumerate(zip(controlnet_cond, conditioning_scale, self.nets)):
+            input_control = sample
+            if controlnet.in_channels==4:
+                input_control=input_control[0]
+            else:
+                input_control=torch.cat(input_control, dim=1)
+                
+            down_samples, mid_sample = controlnet(
+                sample=input_control,
+                timestep=timestep,
+                encoder_hidden_states=encoder_hidden_states,
+                controlnet_cond=image,
+                conditioning_scale=scale,
+                class_labels=class_labels,
+                timestep_cond=timestep_cond,
+                attention_mask=attention_mask,
+                added_cond_kwargs=added_cond_kwargs,
+                cross_attention_kwargs=cross_attention_kwargs,
+                guess_mode=guess_mode,
+                return_dict=return_dict,
+            )
+
+            # merge samples
+            if i == 0:
+                down_block_res_samples, mid_block_res_sample = down_samples, mid_sample
+            else:
+                down_block_res_samples = [
+                    samples_prev + samples_curr
+                    for samples_prev, samples_curr in zip(down_block_res_samples, down_samples)
+                ]
+                mid_block_res_sample += mid_sample
+
+        return down_block_res_samples, mid_block_res_sample
+        """
         for i in range(len(self.nets)+1): 
             image = controlnet_cond[i]
             scale = conditioning_scale
@@ -81,7 +115,7 @@ class MultiControlNetModel(ModelMixin):
                 mid_block_res_sample += mid_sample
 
         return down_block_res_samples, mid_block_res_sample
-
+        """
     def save_pretrained(
         self,
         save_directory: Union[str, os.PathLike],
