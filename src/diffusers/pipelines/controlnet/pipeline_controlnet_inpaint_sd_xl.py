@@ -1707,12 +1707,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     controlnet_prompt_embeds = prompt_embeds
                     controlnet_added_cond_kwargs = added_cond_kwargs
 
-                if isinstance(controlnet_conditioning_scale, float):
-                    raise ValueError(
-                        f"Crazy2!"
-                        f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
-                    )
-                if isinstance(controlnet_keep[i], list) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
+                if isinstance(controlnet_keep[i], list):
                     cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
                 else:
                     controlnet_cond_scale = controlnet_conditioning_scale
