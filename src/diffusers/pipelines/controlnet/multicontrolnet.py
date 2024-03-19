@@ -44,9 +44,10 @@ class MultiControlNetModel(ModelMixin):
         guess_mode: bool = False,
         return_dict: bool = True,
     ) -> Union[ControlNetOutput, Tuple]:
+        print(conditioning_scale, "cond_scale")
         for i in range(len(self.nets)): 
             image = controlnet_cond[i]
-            scale = conditioning_scale[i]
+            scale = conditioning_scale
             controlnet = self.nets[i]
             
             input_control = sample
