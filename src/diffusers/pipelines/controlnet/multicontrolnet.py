@@ -44,8 +44,8 @@ class MultiControlNetModel(ModelMixin):
         guess_mode: bool = False,
         return_dict: bool = True,
     ) -> Union[ControlNetOutput, Tuple]:
-        print(conditioning_scale)
-        #if isinstance(conditioning_scale, list):
+        if not isinstance(conditioning_scale, list):
+            conditioning_scale = [conditioning_scale] * len(self.nets)
         for i, (image, scale, controlnet) in enumerate(zip(controlnet_cond, conditioning_scale, self.nets)):
             input_control = sample
             if controlnet.in_channels==4:
