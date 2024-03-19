@@ -1421,12 +1421,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
         if isinstance(controlnet, MultiControlNetModel) and isinstance(controlnet_conditioning_scale, float):
             controlnet_conditioning_scale = [controlnet_conditioning_scale] * len(controlnet.nets)
 
-        if isinstance(controlnet_conditioning_scale, float):
-            raise ValueError(
-                f"Crazy1!"
-                f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
-            )
-
         # 3. Encode input prompt
         text_encoder_lora_scale = (
             self.cross_attention_kwargs.get("scale", None) if self.cross_attention_kwargs is not None else None
@@ -1723,6 +1717,12 @@ class StableDiffusionXLControlNetInpaintPipeline(
                         control_model_input = [latent_model_input, mask, masked_image_latents]
                     else:
                         control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
+
+                if len(cond_scale)<2:
+                    raise ValueError(
+                        f"Crazy1!"
+                        f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
+                    )
                 
                 down_block_res_samples, mid_block_res_sample = self.controlnet(
                     control_model_input,
