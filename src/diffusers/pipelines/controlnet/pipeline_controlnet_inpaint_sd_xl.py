@@ -1412,7 +1412,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     self.controlnet, torch._dynamo.eval_frame.OptimizedModule
                 )
 
-        if isinstance(controlnet_conditioning_scale, float)
+        if isinstance(controlnet_conditioning_scale, float):
             raise ValueError(
                 f"Crazy!"
                 f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
