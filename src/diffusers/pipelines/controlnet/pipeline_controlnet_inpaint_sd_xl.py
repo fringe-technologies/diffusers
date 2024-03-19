@@ -1691,7 +1691,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     controlnet_prompt_embeds = prompt_embeds
                     controlnet_added_cond_kwargs = added_cond_kwargs
 
-                if isinstance(controlnet_keep[i], list):
+                if isinstance(controlnet_keep[i], list) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
                     cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
                 else:
                     controlnet_cond_scale = controlnet_conditioning_scale
@@ -1703,7 +1703,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 # if control_image.shape[-2:] != control_model_input.shape[-2:]:
                 #     control_image = F.interpolate(control_image, size=control_model_input.shape[-2:], mode="bilinear", align_corners=False)
                 if num_channels_unet == 9:
-                    if isinstance(controlnet_keep[i], list):
+                    if isinstance(controlnet_keep[i], list) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
                         control_model_input = [latent_model_input, mask, masked_image_latents]
                     else:
                         control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
