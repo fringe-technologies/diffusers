@@ -48,11 +48,14 @@ class MultiControlNetModel(ModelMixin):
             image = controlnet_cond[i]
             scale = conditioning_scale
             controlnet = self.nets[i]
-            
-            #input_control=torch.cat(sample, dim=1)
+
+            if self.nets[i].in_channels==9:
+                input_control=torch.cat(sample, dim=1)
+            if self.nets[i].in_channels==4:
+                input_control=sample[0]
                 
             down_samples, mid_sample = controlnet(
-                sample=sample,
+                sample=input_control,
                 timestep=timestep,
                 encoder_hidden_states=encoder_hidden_states,
                 controlnet_cond=image,
