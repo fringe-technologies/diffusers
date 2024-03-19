@@ -1125,7 +1125,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
     @replace_example_docstring(EXAMPLE_DOC_STRING)
     def __call__(
         self,
-        controlnet_conditioning_scale: Union[float, List[float]],
+        controlnet_conditioning_scale: Union[float, List[float]] = 1.0,
         prompt: Union[str, List[str]] = None,
         prompt_2: Optional[Union[str, List[str]]] = None,
         image: PipelineImageInput = None,
@@ -1411,6 +1411,12 @@ class StableDiffusionXLControlNetInpaintPipeline(
         is_compiled = hasattr(F, "scaled_dot_product_attention") and isinstance(
                     self.controlnet, torch._dynamo.eval_frame.OptimizedModule
                 )
+
+        if isinstance(controlnet_conditioning_scale, float)
+            raise ValueError(
+                f"Crazy!"
+                f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
+            )
         
         if isinstance(controlnet, MultiControlNetModel) and isinstance(controlnet_conditioning_scale, float):
             controlnet_conditioning_scale = [controlnet_conditioning_scale] * len(controlnet.nets)
