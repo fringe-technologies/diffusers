@@ -1690,7 +1690,10 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     control_model_input = latent_model_input
                     controlnet_prompt_embeds = prompt_embeds
                     controlnet_added_cond_kwargs = added_cond_kwargs
-
+                    
+                is_compiled = hasattr(F, "scaled_dot_product_attention") and isinstance(
+                    self.controlnet, torch._dynamo.eval_frame.OptimizedModule
+                )
                 if isinstance(controlnet_keep[i], list) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
                     cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
                 else:
