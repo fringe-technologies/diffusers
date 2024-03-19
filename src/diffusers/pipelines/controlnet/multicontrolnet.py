@@ -49,11 +49,7 @@ class MultiControlNetModel(ModelMixin):
             scale = conditioning_scale
             controlnet = self.nets[i]
             
-            input_control = sample
-            if controlnet.in_channels==4:
-                input_control=input_control[0]
-            else:
-                input_control=torch.cat(input_control, dim=1)
+            #input_control=torch.cat(sample, dim=1)
                 
             down_samples, mid_sample = controlnet(
                 sample=input_control,
