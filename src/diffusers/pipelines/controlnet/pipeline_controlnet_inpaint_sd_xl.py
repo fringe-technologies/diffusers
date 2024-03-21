@@ -1408,16 +1408,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
 
         device = self._execution_device
         
-        is_compiled = hasattr(F, "scaled_dot_product_attention") and isinstance(
-                    self.controlnet, torch._dynamo.eval_frame.OptimizedModule
-                )
-
-        if isinstance(controlnet_conditioning_scale, float):
-            raise ValueError(
-                f"Crazy!"
-                f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
-            )
-        
         if isinstance(controlnet, MultiControlNetModel) and isinstance(controlnet_conditioning_scale, float):
             controlnet_conditioning_scale = [controlnet_conditioning_scale] * len(controlnet.nets)
 
@@ -1611,7 +1601,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 1.0 - float(i / len(timesteps) < s or (i + 1) / len(timesteps) > e)
                 for s, e in zip(control_guidance_start, control_guidance_end)
             ]
-            if isinstance(self.controlnet, MultiControlNetModel) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
+            if isinstance(self.controlnet, MultiControlNetModel):
                 controlnet_keep.append(keeps)
             else:
                 controlnet_keep.append(keeps[0])
@@ -1713,7 +1703,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 # if control_image.shape[-2:] != control_model_input.shape[-2:]:
                 #     control_image = F.interpolate(control_image, size=control_model_input.shape[-2:], mode="bilinear", align_corners=False)
                 if num_channels_unet == 9:
-                    if isinstance(controlnet_keep[i], list) or is_compiled and isinstance(self.controlnet._orig_mod, MultiControlNetModel):
+                    if isinstance(controlnet_keep[i], list):
                         control_model_input = [latent_model_input, mask, masked_image_latents]
                     else:
                         control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
