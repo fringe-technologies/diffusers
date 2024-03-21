@@ -1125,7 +1125,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
     @replace_example_docstring(EXAMPLE_DOC_STRING)
     def __call__(
         self,
-        controlnet_conditioning_scale: Union[float, List[float]] = 1.0,
         prompt: Union[str, List[str]] = None,
         prompt_2: Optional[Union[str, List[str]]] = None,
         image: PipelineImageInput = None,
@@ -1157,6 +1156,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
         output_type: Optional[str] = "pil",
         return_dict: bool = True,
         cross_attention_kwargs: Optional[Dict[str, Any]] = None,
+        controlnet_conditioning_scale: Union[float, List[float]] = 1.0,
         guess_mode: bool = False,
         control_guidance_start: Union[float, List[float]] = 0.0,
         control_guidance_end: Union[float, List[float]] = 1.0,
@@ -1407,7 +1407,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
             batch_size = prompt_embeds.shape[0]
 
         device = self._execution_device
-        
+
         if isinstance(controlnet, MultiControlNetModel) and isinstance(controlnet_conditioning_scale, float):
             controlnet_conditioning_scale = [controlnet_conditioning_scale] * len(controlnet.nets)
 
@@ -1707,12 +1707,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
                         control_model_input = [latent_model_input, mask, masked_image_latents]
                     else:
                         control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
-
-                if len(cond_scale)<2:
-                    raise ValueError(
-                        f"Crazy1!"
-                        f"steps is {num_inference_steps} which is < 1 and not appropriate for this pipeline."
-                    )
                 
                 down_block_res_samples, mid_block_res_sample = self.controlnet(
                     control_model_input,
