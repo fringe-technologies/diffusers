@@ -1666,6 +1666,12 @@ class StableDiffusionXLControlNetInpaintPipeline(
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 # expand the latents if we are doing classifier free guidance
+                if end_cfg is not None and i / num_inference_steps > end_cfg and self.do_classifier_free_guidance:
+                    self.do_classifier_free_guidance = False
+                    prompt_embeds = prompt_embeds.chunk(2)[-1]
+                    add_text_embeds = add_text_embeds.chunk(2)[-1]
+                    add_time_ids = add_time_ids.chunk(2)[-1]
+                    
                 latent_model_input = torch.cat([latents] * 2) if self.do_classifier_free_guidance else latents
 
                 # concat latents, mask, masked_image_latents in the channel dimension
