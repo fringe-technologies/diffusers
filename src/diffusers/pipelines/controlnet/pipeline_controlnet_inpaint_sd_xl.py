@@ -1705,11 +1705,17 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 #     control_image = F.interpolate(control_image, size=control_model_input.shape[-2:], mode="bilinear", align_corners=False)
                     
                 if num_channels_unet == 9:
-                    if isinstance(controlnet_keep[i], list):
-                        control_model_input = [latent_model_input, mask, masked_image_latents]
+                    if do_classifier_free_guidance:
+                        if isinstance(controlnet_keep[i], list):
+                            control_model_input = [latent_model_input, mask, masked_image_latents]
+                        else:
+                            control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
                     else:
-                        control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
-                        
+                        if isinstance(controlnet_keep[i], list):
+                            control_model_input = [latent_model_input.chunk(2)[-1], mask, masked_image_latents]
+                        else:
+                            control_model_input = torch.cat([latent_model_input.chunk(2)[-1], mask, masked_image_latents], dim=1)
+                            
                 down_block_res_samples, mid_block_res_sample = self.controlnet(
                     control_model_input,
                     t,
