@@ -49,11 +49,6 @@ class MultiControlNetModel(ModelMixin):
             if controlnet.in_channels==4:
                 input_control=input_control[0]
             else:
-                for i in input_control:
-                    logger.info(i.shape)
-                input_control[0] = input_control[0].chunk(2)[-1]
-                input_control[1] = input_control[1].chunk(2)[-1]
-                input_control[2] = input_control[2].chunk(2)[-1]
                 input_control=torch.cat(input_control, dim=1)
 
             down_samples, mid_sample = controlnet(
