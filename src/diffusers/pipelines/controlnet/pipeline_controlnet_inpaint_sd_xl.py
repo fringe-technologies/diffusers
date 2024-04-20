@@ -1686,7 +1686,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 # controlnet(s) inference
                 if not self.do_classifier_free_guidance:
                     control_model_input = latent_model_input
-                    controlnet_prompt_embeds = prompt_embeds.chunk(2)[1]
+                    controlnet_prompt_embeds = prompt_embeds
                     controlnet_added_cond_kwargs = {
                         "text_embeds": add_text_embeds.chunk(2)[1],
                         "time_ids": add_time_ids.chunk(2)[1],
