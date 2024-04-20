@@ -1680,8 +1680,10 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     mask = mask.chunk(2)[-1]
                     masked_image_latents = masked_image_latents.chunk(2)[-1]
 
-                if i / num_inference_steps >= start_cfg and i / num_inference_steps <= end_cfg:
+                if i / num_inference_steps >= start_cfg and i / num_inference_steps <= end_cfg and not do_classifier_free_guidance:
                     do_classifier_free_guidance = True
+                    mask = torch.cat([mask] * 2)
+                    masked_image_latents = torch.cat([masked_image_latents] * 2)
 
                 logger.warning(f"do{do_classifier_free_guidance}")
                 logger.warning(f"{self.do_classifier_free_guidance}")
