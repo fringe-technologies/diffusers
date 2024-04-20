@@ -192,7 +192,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
 
     model_cpu_offload_seq = "text_encoder->text_encoder_2->unet->vae"
     _optional_components = ["tokenizer", "tokenizer_2", "text_encoder", "text_encoder_2"]
-    _callback_tensor_inputs = ["latents", "prompt_embeds", "negative_prompt_embeds"]
+    _callback_tensor_inputs = ["latents", "prompt_embeds", "negative_prompt_embeds", "mask", "masked_image_latents"]
 
     def __init__(
         self,
@@ -1708,10 +1708,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 # # Resize control_image to match the size of the input to the controlnet
                 # if control_image.shape[-2:] != control_model_input.shape[-2:]:
                 #     control_image = F.interpolate(control_image, size=control_model_input.shape[-2:], mode="bilinear", align_corners=False)
-
-                if not self.do_classifier_free_guidance:
-                    mask = mask.chunk(2)[-1]
-                    masked_image_latents = masked_image_latents.chunk(2)[-1]
                      
                 if num_channels_unet == 9:
                     if isinstance(controlnet_keep[i], list):
@@ -1791,6 +1787,8 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     latents = callback_outputs.pop("latents", latents)
                     prompt_embeds = callback_outputs.pop("prompt_embeds", prompt_embeds)
                     negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
+                    mask = callback_outputs.pop("mask", mask)
+                    masked_image_latents = callback_outputs.pop("masked_image_latents", masked_image_latents)
 
                 # call the callback, if provided
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
