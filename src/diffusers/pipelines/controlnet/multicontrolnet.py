@@ -50,7 +50,8 @@ class MultiControlNetModel(ModelMixin):
                 input_control=input_control[0]
             else:
                 for i in input_control:
-                    print(i.shape)
+                    logger.info(i.shape)
+                input_control[0] = input_control[0].chunk(2)[-1]
                 input_control=torch.cat(input_control, dim=1)
 
             down_samples, mid_sample = controlnet(
