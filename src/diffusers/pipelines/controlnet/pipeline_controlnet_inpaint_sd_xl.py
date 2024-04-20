@@ -1685,7 +1685,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 logger.warning(
                     f"You have {latent_model_input.shape}, {add_text_embeds.shape}, {add_time_ids.shape}, {prompt_embeds.shape}, 
                         {masked_image_latents.shape}, {mask.shape} ControlNets and you have passed"
-                    " prompts. The conditionings will be fixed across the prompts."
                 )
 
                 added_cond_kwargs = {"text_embeds": add_text_embeds, "time_ids": add_time_ids}
