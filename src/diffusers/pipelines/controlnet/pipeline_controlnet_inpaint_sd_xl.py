@@ -1672,11 +1672,12 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 if end_cfg is not None and i / num_inference_steps > end_cfg and do_classifier_free_guidance:
                     do_classifier_free_guidance = False
                     prompt_embeds = prompt_embeds.chunk(2)[-1]
-                    negative_prompt_embeds = negative_prompt_embeds.chunk(2)[-1]
                     mask = mask.chunk(2)[-1]
                     masked_image_latents = masked_image_latents.chunk(2)[-1]
+                    add_text_embeds = add_text_embeds.chunk(2, dim=0)[-1]
+                    add_time_ids = add_time_ids.chunk(2, dim=0)[-1]
                     
-                latent_model_input = torch.cat([latents] * 2) if self.do_classifier_free_guidance else latents
+                latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
                 # concat latents, mask, masked_image_latents in the channel dimension
                 latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
