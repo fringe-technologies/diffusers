@@ -1673,6 +1673,8 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     do_classifier_free_guidance = False
                     mask = mask.chunk(2)[-1]
                     masked_image_latents = masked_image_latents.chunk(2)[-1]
+                    add_text_embeds = add_text_embeds.chunk(2, dim=0)[-1]
+                    add_time_ids = add_time_ids.chunk(2, dim=0)[-1]
 
                 latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
@@ -1708,9 +1710,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
                         else:
                             control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
                     else:
-                        add_text_embeds = add_text_embeds.chunk(2, dim=0)[-1]
-                        add_time_ids = add_time_ids.chunk(2, dim=0)[-1]
-                        
                         if isinstance(controlnet_keep[i], list):
                             control_model_input = [latent_model_input, mask, masked_image_latents]
                         else:
