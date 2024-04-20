@@ -1679,9 +1679,9 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 # concat latents, mask, masked_image_latents in the channel dimension
                 latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
 
-                logger.warning(
-                    f"You have {latent_model_input.shape}, {add_text_embeds.shape}, {add_time_ids.shape}, {prompt_embeds.shape}, {masked_image_latents.shape}, {mask.shape} ControlNets and you have passed"
-                )
+                #logger.warning(
+                #    f"You have {latent_model_input.shape}, {add_text_embeds.shape}, {add_time_ids.shape}, {prompt_embeds.shape}, {masked_image_latents.shape}, {mask.shape} ControlNets and you have passed"
+                #)
 
                 added_cond_kwargs = {"text_embeds": add_text_embeds, "time_ids": add_time_ids}
 
@@ -1697,9 +1697,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
                         controlnet_cond_scale = controlnet_cond_scale[0]
                     cond_scale = controlnet_cond_scale * controlnet_keep[i]
 
-                # # Resize control_image to match the size of the input to the controlnet
-                # if control_image.shape[-2:] != control_model_input.shape[-2:]:
-                #     control_image = F.interpolate(control_image, size=control_model_input.shape[-2:], mode="bilinear", align_corners=False)
                     
                 if num_channels_unet == 9:
                     if do_classifier_free_guidance:
@@ -1708,6 +1705,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                         else:
                             control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
                     else:
+                        controlnet_added_cond_kwargs = {"text_embeds": add_text_embeds.chunk(2, dim=0)[-1], "time_ids": add_time_ids.chunk(2, dim=0)[-1]}
                         if isinstance(controlnet_keep[i], list):
                             control_model_input = [latent_model_input, mask, masked_image_latents]
                         else:
@@ -1721,16 +1719,9 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     controlnet_cond=control_image,
                     conditioning_scale=cond_scale,
                     guess_mode=guess_mode,
-                    added_cond_kwargs={"text_embeds": add_text_embeds.chunk(2, dim=0)[-1], "time_ids": add_time_ids.chunk(2, dim=0)[-1]},
+                    added_cond_kwargs=controlnet_added_cond_kwargs,
                     return_dict=False,
                 )
-
-                if guess_mode and self.do_classifier_free_guidance:
-                    # Infered ControlNet only for the conditional batch.
-                    # To apply the output of ControlNet to both the unconditional and conditional batches,
-                    # add 0 to the unconditional batch to keep it unchanged.
-                    down_block_res_samples = [torch.cat([torch.zeros_like(d), d]) for d in down_block_res_samples]
-                    mid_block_res_sample = torch.cat([torch.zeros_like(mid_block_res_sample), mid_block_res_sample])
 
                 if ip_adapter_image is not None:
                     added_cond_kwargs["image_embeds"] = image_embeds
