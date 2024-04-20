@@ -192,7 +192,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
 
     model_cpu_offload_seq = "text_encoder->text_encoder_2->unet->vae"
     _optional_components = ["tokenizer", "tokenizer_2", "text_encoder", "text_encoder_2"]
-    _callback_tensor_inputs = ["latents", "prompt_embeds", "negative_prompt_embeds", "mask", "masked_image_latents"]
+    _callback_tensor_inputs = ["latents", "prompt_embeds", "negative_prompt_embeds", "mask", "masked_image_latents", "add_text_embeds", "add_time_ids"]
 
     def __init__(
         self,
@@ -1683,20 +1683,10 @@ class StableDiffusionXLControlNetInpaintPipeline(
 
                 added_cond_kwargs = {"text_embeds": add_text_embeds, "time_ids": add_time_ids}
 
-                # controlnet(s) inference
-                if not self.do_classifier_free_guidance:
-                    control_model_input = latent_model_input
-                    controlnet_prompt_embeds = prompt_embeds
-                    controlnet_added_cond_kwargs = {
-                        "text_embeds": add_text_embeds.chunk(2)[1],
-                        "time_ids": add_time_ids.chunk(2)[1],
-                    }
-                else:
-                    control_model_input = latent_model_input
-                    controlnet_prompt_embeds = prompt_embeds
-                    controlnet_added_cond_kwargs = {"text_embeds": add_text_embeds,
-                                                    "time_ids": add_time_ids}
-
+                control_model_input = latent_model_input
+                controlnet_prompt_embeds = prompt_embeds
+                controlnet_added_cond_kwargs = added_cond_kwargs
+                
                 if isinstance(controlnet_keep[i], list):
                     cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
                 else:
@@ -1789,6 +1779,8 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
                     mask = callback_outputs.pop("mask", mask)
                     masked_image_latents = callback_outputs.pop("masked_image_latents", masked_image_latents)
+                    add_text_embeds = callback_outputs.pop("add_text_embeds", add_text_embeds)
+                    add_time_ids = callback_outputs.pop("add_time_ids", add_time_ids)
 
                 # call the callback, if provided
                 if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
