@@ -1170,6 +1170,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
         end_cfg: float = 1.0,
+        start_cfg: float = 0.0
         **kwargs,
     ):
         r"""
@@ -1670,6 +1671,11 @@ class StableDiffusionXLControlNetInpaintPipeline(
             for i, t in enumerate(timesteps):
                 # expand the latents if we are doing classifier free guidance
                 if end_cfg is not None and i / num_inference_steps > end_cfg and do_classifier_free_guidance:
+                    do_classifier_free_guidance = False
+                    mask = mask.chunk(2)[-1]
+                    masked_image_latents = masked_image_latents.chunk(2)[-1]
+
+                if start_cfg is not None and i / num_inference_steps < start_cfg and do_classifier_free_guidance:
                     do_classifier_free_guidance = False
                     mask = mask.chunk(2)[-1]
                     masked_image_latents = masked_image_latents.chunk(2)[-1]
