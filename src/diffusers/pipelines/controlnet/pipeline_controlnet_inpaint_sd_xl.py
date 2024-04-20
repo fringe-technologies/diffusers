@@ -1729,9 +1729,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
 
                 if num_channels_unet == 9:
                     latent_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
-
-                if guess_mode and self.do_classifier_free_guidance:
-                    prompt_embeds = torch.cat([prompt_embeds] * 2)
                     
                 # predict the noise residual
                 noise_pred = self.unet(
