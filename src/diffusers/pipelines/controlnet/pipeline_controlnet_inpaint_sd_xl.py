@@ -1170,7 +1170,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
         end_cfg: float = 1.0,
-        start_cfg: float = 0.0
+        start_cfg: float = 0.0,
         **kwargs,
     ):
         r"""
