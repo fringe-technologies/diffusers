@@ -1708,7 +1708,10 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 # # Resize control_image to match the size of the input to the controlnet
                 # if control_image.shape[-2:] != control_model_input.shape[-2:]:
                 #     control_image = F.interpolate(control_image, size=control_model_input.shape[-2:], mode="bilinear", align_corners=False)
-                     
+
+                if self.do_classifier_free_guidance:
+                    mask = mask.chunk(2)[-1]
+                    masked_image_latents = masked_image_latents.chunk(2)[-1]
                 if num_channels_unet == 9:
                     if isinstance(controlnet_keep[i], list):
                         control_model_input = [latent_model_input, mask, masked_image_latents]
