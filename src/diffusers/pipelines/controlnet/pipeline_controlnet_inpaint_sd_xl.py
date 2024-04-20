@@ -1676,7 +1676,11 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     masked_image_latents = masked_image_latents.chunk(2)[-1]
                     add_text_embeds = add_text_embeds.chunk(2, dim=0)[-1]
                     add_time_ids = add_time_ids.chunk(2, dim=0)[-1]
-                    
+
+                logger.warning(
+                    f"You have {latents.shape} ControlNets and you have passed"
+                    " prompts. The conditionings will be fixed across the prompts."
+                )
                 latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
                 # concat latents, mask, masked_image_latents in the channel dimension
