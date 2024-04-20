@@ -1684,21 +1684,18 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 added_cond_kwargs = {"text_embeds": add_text_embeds, "time_ids": add_time_ids}
 
                 # controlnet(s) inference
-                if guess_mode and self.do_classifier_free_guidance:
-                    # Infer ControlNet only for the conditional batch.
-                    control_model_input = latents
-                    control_model_input = self.scheduler.scale_model_input(control_model_input, t)
+                if not self.do_classifier_free_guidance:
+                    control_model_input = latent_model_input
                     controlnet_prompt_embeds = prompt_embeds.chunk(2)[1]
                     controlnet_added_cond_kwargs = {
                         "text_embeds": add_text_embeds.chunk(2)[1],
                         "time_ids": add_time_ids.chunk(2)[1],
                     }
-
-                if not self.do_classifier_free_guidance:
+                else:
                     control_model_input = latent_model_input
-                    controlnet_prompt_embeds = prompt_embeds.chunk(2)[1]
-                    controlnet_added_cond_kwargs = {"text_embeds": add_text_embeds.chunk(2)[1],
-                                                    "time_ids": add_time_ids.chunk(2)[1]}
+                    controlnet_prompt_embeds = prompt_embeds
+                    controlnet_added_cond_kwargs = {"text_embeds": add_text_embeds,
+                                                    "time_ids": add_time_ids}
 
                 if isinstance(controlnet_keep[i], list):
                     cond_scale = [c * s for c, s in zip(controlnet_conditioning_scale, controlnet_keep[i])]
