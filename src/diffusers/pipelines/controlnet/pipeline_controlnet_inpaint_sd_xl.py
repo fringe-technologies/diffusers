@@ -1674,6 +1674,8 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     prompt_embeds = prompt_embeds.chunk(2)[-1]
                     add_text_embeds = add_text_embeds.chunk(2)[-1]
                     add_time_ids = add_time_ids.chunk(2)[-1]
+                    mask = mask.chunk(2)[-1]
+                    masked_image_latents = masked_image_latents.chunk(2)[-1]
                     
                 latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
@@ -1708,10 +1710,6 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 # # Resize control_image to match the size of the input to the controlnet
                 # if control_image.shape[-2:] != control_model_input.shape[-2:]:
                 #     control_image = F.interpolate(control_image, size=control_model_input.shape[-2:], mode="bilinear", align_corners=False)
-
-                if not self.do_classifier_free_guidance:
-                    mask = mask.chunk(2)[-1]
-                    masked_image_latents = masked_image_latents.chunk(2)[-1]
                     
                 if num_channels_unet == 9:
                     if isinstance(controlnet_keep[i], list):
