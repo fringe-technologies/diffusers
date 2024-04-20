@@ -1674,7 +1674,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     mask = mask.chunk(2)[-1]
                     masked_image_latents = masked_image_latents.chunk(2)[-1]
 
-                latent_model_input = torch.cat([latents] * 2) if self.do_classifier_free_guidance else latents
+                latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
                 # concat latents, mask, masked_image_latents in the channel dimension
                 latent_model_input = self.scheduler.scale_model_input(latent_model_input, t)
@@ -1708,10 +1708,13 @@ class StableDiffusionXLControlNetInpaintPipeline(
                         else:
                             control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
                     else:
+                        add_text_embeds = add_text_embeds.chunk(2, dim=0)[-1]
+                        add_time_ids = add_time_ids.chunk(2, dim=0)[-1]
+                        
                         if isinstance(controlnet_keep[i], list):
-                            control_model_input = [latent_model_input.chunk(2)[-1], mask, masked_image_latents]
+                            control_model_input = [latent_model_input, mask, masked_image_latents]
                         else:
-                            control_model_input = torch.cat([latent_model_input.chunk(2)[-1], mask, masked_image_latents], dim=1)
+                            control_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
                             
                             
                 down_block_res_samples, mid_block_res_sample = self.controlnet(
@@ -1721,7 +1724,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     controlnet_cond=control_image,
                     conditioning_scale=cond_scale,
                     guess_mode=guess_mode,
-                    added_cond_kwargs={"text_embeds": add_text_embeds.chunk(2, dim=0)[-1], "time_ids": add_time_ids.chunk(2, dim=0)[-1]},
+                    added_cond_kwargs={"text_embeds": add_text_embeds, "time_ids": add_time_ids},
                     return_dict=False,
                 )
 
