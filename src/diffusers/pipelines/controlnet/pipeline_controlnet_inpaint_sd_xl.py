@@ -1680,6 +1680,8 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     mask = mask.chunk(2)[-1]
                     masked_image_latents = masked_image_latents.chunk(2)[-1]
 
+                logger.warning(f"do{do_classifier_free_guidance}")
+                logger.warning(f"{self.do_classifier_free_guidance}")
                 latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
                 # concat latents, mask, masked_image_latents in the channel dimension
