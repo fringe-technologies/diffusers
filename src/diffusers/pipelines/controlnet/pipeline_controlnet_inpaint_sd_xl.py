@@ -1743,7 +1743,8 @@ class StableDiffusionXLControlNetInpaintPipeline(
 
                 if True:
                     raise ValueError(
-                f"The unet {latent_model_input.shape, t,  prompt_embeds.shape, cross_attention_kwargs, down_block_res_samples.shape, mid_block_res_sample.shape, added_cond_kwargs.shape}."
+                f"The unet {latent_model_input.shape, t,  prompt_embeds.shape, self.cross_attention_kwargs, [d.shape for d in down_block_res_samples], mid_block_res_sample.shape,
+                            added_cond_kwargs["text_embeds"].shape, added_cond_kwargs["time_ids"].shape}."
                 )    
 
                 # perform guidance
