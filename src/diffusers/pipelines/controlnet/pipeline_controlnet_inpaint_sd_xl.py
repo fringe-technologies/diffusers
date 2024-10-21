@@ -1741,6 +1741,11 @@ class StableDiffusionXLControlNetInpaintPipeline(
                     return_dict=False,
                 )[0]
 
+                if True:
+                    raise ValueError(
+                f"The unet {latent_model_input.shape, t,  prompt_embeds.shape, cross_attention_kwargs, down_block_res_samples.shape, mid_block_res_sample.shape, added_cond_kwargs.shape}."
+                )    
+
                 # perform guidance
                 if self.do_classifier_free_guidance:
                     noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
