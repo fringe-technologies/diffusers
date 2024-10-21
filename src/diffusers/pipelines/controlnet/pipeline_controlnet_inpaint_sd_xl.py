@@ -1745,11 +1745,11 @@ class StableDiffusionXLControlNetInpaintPipeline(
                         f"The unet {latent_model_input.shape, t, 
                                     prompt_embeds.shape, self.cross_attention_kwargs,
                                     mid_block_res_sample.shape, 
-                                    added_cond_kwargs['text_embeds'].shape, 
-                                    added_cond_kwargs['time_ids'].shape}."
+                                    add_text_embeds.shape, 
+                                    add_time_ids.shape}."
                 )    
 
-                logger.warning(f'{d.shape for d in down_block_res_samples}')
+                logger.warning(f"{[d.shape for d in down_block_res_samples]}")
 
                 # perform guidance
                 if self.do_classifier_free_guidance:
