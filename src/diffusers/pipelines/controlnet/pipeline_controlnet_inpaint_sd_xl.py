@@ -1742,11 +1742,7 @@ class StableDiffusionXLControlNetInpaintPipeline(
                 )[0]
 
                 logger.warning(
-                        f"The unet {latent_model_input.shape, t, 
-                                    prompt_embeds.shape, self.cross_attention_kwargs,
-                                    mid_block_res_sample.shape, 
-                                    add_text_embeds.shape, 
-                                    add_time_ids.shape}."
+                        f"The unet {latent_model_input.shape, t, prompt_embeds.shape, self.cross_attention_kwargs, mid_block_res_sample.shape, add_text_embeds.shape, add_time_ids.shape}."
                 )    
 
                 logger.warning(f"{[d.shape for d in down_block_res_samples]}")
