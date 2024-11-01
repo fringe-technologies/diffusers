@@ -514,7 +514,7 @@ class FluxMultiControlNetModel(ModelMixin):
                     joint_attention_kwargs=joint_attention_kwargs,
                     return_dict=return_dict,
                 )
-
+                logger.warning('multi')
                 # merge samples
                 if i == 0:
                     control_block_samples = block_samples
